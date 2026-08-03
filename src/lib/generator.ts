@@ -84,130 +84,127 @@ function generateEmail(firstName: string, lastName: string, domain: string, dob?
   ];
 
   const getHumanNumber = () => {
-    if (Math.random() < 0.6) {
+    if (Math.random() < 0.7) {
       return pick(humanNumbers);
     } else {
-      return Math.random() < 0.7
-        ? String(Math.floor(Math.random() * 900) + 100)
-        : String(Math.floor(Math.random() * 9000) + 1000);
+      const realisticPool = ["248", "351", "482", "617", "731", "842", "915", "1034", "531"];
+      return Math.random() < 0.5
+        ? pick(realisticPool)
+        : String(Math.floor(Math.random() * 900) + 100);
     }
   };
 
   const num = getHumanNumber();
-  const rand3 = String(Math.floor(Math.random() * 900) + 100);
 
-  // Group 1: 50% - Birth year based
+  // Group 1: 55% - Birth Year Templates
   const groupYear: (() => string)[] = [
     () => `${fn}${ln}${ys}`,
     () => `${fn}.${ln}${ys}`,
+    () => `${fn}_${ln}${ys}`,
+    () => `${fn}-${ln}${ys}`,
     () => `${fn}${ln}${yf}`,
     () => `${fn}.${ln}${yf}`,
-    () => `${fn}_${ln}${ys}`,
     () => `${fn}_${ln}${yf}`,
-    () => `${fn}${ln}_${ys}`,
-    () => `${fn}${ln}_${yf}`,
-    () => `${fn}${ys}${ln}`,
-    () => `${fn}${yf}${ln}`,
-    () => `${ln}${fn}${ys}`,
-    () => `${ln}.${fn}${ys}`,
-    () => `${ln}${fn}${yf}`,
-    () => `${ln}.${fn}${yf}`,
-    () => `${ln}_${fn}${ys}`,
-    () => `${fn}-${ln}${ys}`,
-    () => `${fn}.${ln}_${ys}`,
-    () => `${fn}${ys}.${ln}`,
-    () => `${fn}${yf}.${ln}`,
-    () => `${fn}${ln}.${ys}`,
-    () => `${fn}${ln}.${yf}`,
-    () => `${ln}${ys}${fn}`,
-    () => `${fn}.${ln}-${ys}`,
     () => `${fn}-${ln}${yf}`,
-  ];
-
-  // Group 2: 25% - Initial + year / Name + year
-  const groupInitialYear: (() => string)[] = [
     () => `${fi}${ln}${ys}`,
-    () => `${fi}${ln}${yf}`,
     () => `${fi}.${ln}${ys}`,
+    () => `${fi}_${ln}${ys}`,
+    () => `${fi}${ln}${yf}`,
     () => `${fi}.${ln}${yf}`,
     () => `${fn}${ys}`,
     () => `${fn}${yf}`,
-    () => `${fn}.${yf}`,
     () => `${fn}.${ys}`,
-    () => `${fi}_${ln}${ys}`,
-    () => `${fi}_${ln}${yf}`,
-    () => `${ln}${fi}${ys}`,
-    () => `${ln}${fi}${yf}`,
-    () => `${ln}.${fi}${ys}`,
-    () => `${ln}.${fi}${yf}`,
+    () => `${fn}_${ys}`,
+    () => `${fn}${ln}_${ys}`,
+    () => `${fn}${ln}_${yf}`,
+    () => `${ln}${fn}${ys}`,
+    () => `${ln}.${fn}${ys}`,
+    () => `${ln}_${fn}${ys}`,
+    () => `${ln}${fn}${yf}`,
+    () => `${ln}.${fn}${yf}`,
+    () => `${fn}${ys}${ln}`,
     () => `${fn}${li}${ys}`,
     () => `${fn}${li}${yf}`,
     () => `${fn}.${li}${ys}`,
-    () => `${fn}.${li}${yf}`,
+    () => `${fn}_${li}${ys}`,
     () => `${fi}${ln}_${ys}`,
-    () => `${fi}${ln}_${yf}`,
   ];
 
-  // Group 3: 15% - Month/day combinations
+  // Group 2: 20% - Month + Day Templates
   const groupMonthDay: (() => string)[] = [
     () => `${fn}${ln}${dm}`,
     () => `${fn}${ln}${md}`,
     () => `${fn}.${ln}${dm}`,
     () => `${fn}.${ln}${md}`,
-    () => `${fn}${dm}${ys}`,
-    () => `${fn}${md}${ys}`,
-    () => `${fn}${ln}${dm}${ys}`,
-    () => `${fn}.${ln}${dm}${ys}`,
-    () => `${fi}${ln}${dm}`,
-    () => `${fi}${ln}${md}`,
-    () => `${fn}_${dm}`,
-    () => `${fn}_${md}`,
-    () => `${ln}.${fn}${dm}`,
-    () => `${ln}.${fn}${md}`,
     () => `${fn}_${ln}${dm}`,
     () => `${fn}_${ln}${md}`,
     () => `${fn}${dm}`,
     () => `${fn}${md}`,
+    () => `${fn}.${li}${dm}`,
+    () => `${fn}.${li}${md}`,
+    () => `${fn}_${li}${dm}`,
+    () => `${fn}_${li}${md}`,
+    () => `${fi}${ln}${dm}`,
+    () => `${fi}${ln}${md}`,
+    () => `${fi}.${ln}${dm}`,
+    () => `${fi}.${ln}${md}`,
+    () => `${ln}.${fn}${dm}`,
+    () => `${ln}.${fn}${md}`,
+    () => `${ln}${fn}${dm}`,
+    () => `${ln}${fn}${md}`,
+    () => `${fn}${dm}${ys}`,
+    () => `${fn}${md}${ys}`,
   ];
 
-  // Group 4: 8% - Realistic random numbers
+  // Group 3: 15% - Human-like Random Numbers Templates
   const groupRandomNumbers: (() => string)[] = [
     () => `${fn}${ln}${num}`,
     () => `${fn}.${ln}${num}`,
-    () => `${fn}${ln}${rand3}`,
-    () => `${fn}${rand3}`,
-    () => `${fn}_${ln}${rand3}`,
+    () => `${fn}_${ln}${num}`,
+    () => `${fn}-${ln}${num}`,
     () => `${fi}${ln}${num}`,
-    () => `${fn}.${ln}${num}`,
-    () => `${fn}${ln}${num}`,
-    () => `${fi}${ln}${num}`,
+    () => `${fi}.${ln}${num}`,
+    () => `${fi}_${ln}${num}`,
+    () => `${fn}${num}`,
     () => `${fn}_${num}`,
+    () => `${fn}.${num}`,
     () => `${ln}${fn}${num}`,
     () => `${ln}.${fn}${num}`,
-    () => `${fn}.${num}`,
+    () => `${ln}_${fn}${num}`,
+    () => `${fn}${li}${num}`,
+    () => `${fn}.${li}${num}`,
+    () => `${fn}_${li}${num}`,
+    () => `${fi}${li}${num}`,
+    () => `${ln}${num}`,
+    () => `${ln}_${num}`,
+    () => `${ln}.${num}`,
   ];
 
-  // Group 5: 2% - Simple usernames
+  // Group 4: 10% - Simple Usernames Templates
   const groupSimple: (() => string)[] = [
     () => `${fn}${ln}`,
     () => `${fn}.${ln}`,
+    () => `${fn}_${ln}`,
+    () => `${fn}-${ln}`,
     () => `${fi}${ln}`,
+    () => `${fi}.${ln}`,
+    () => `${fi}_${ln}`,
     () => `${ln}${fn}`,
     () => `${ln}.${fn}`,
-    () => `${fi}_${ln}`,
-    () => `${fn}_${ln}`,
+    () => `${ln}_${fn}`,
+    () => `${fn}${li}`,
+    () => `${fn}.${li}`,
+    () => `${fn}_${li}`,
   ];
 
   const rand = Math.random();
   let local: string;
 
-  if (rand < 0.50) {
+  if (rand < 0.55) {
     local = pick(groupYear)();
   } else if (rand < 0.75) {
-    local = pick(groupInitialYear)();
-  } else if (rand < 0.90) {
     local = pick(groupMonthDay)();
-  } else if (rand < 0.98) {
+  } else if (rand < 0.90) {
     local = pick(groupRandomNumbers)();
   } else {
     local = pick(groupSimple)();
