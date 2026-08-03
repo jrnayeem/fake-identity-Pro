@@ -47,14 +47,173 @@ function generateUsername(firstName: string, lastName: string): string {
   return result.length > 20 ? result.slice(0, 20) : result;
 }
 
-function generateEmail(firstName: string,lastName: string,domain: string,dob?: string): string {
-const fn=firstName.toLowerCase().replace(/[^a-z]/g,"");
-const ln=lastName.toLowerCase().replace(/[^a-z]/g,"");
-let year="",sy="",ymd="",dmy="",mdy="",yymmdd="",mmdd="",ddmm="",md="";
-if(dob){const[y,m,d]=dob.split("-");year=y;sy=y.slice(-2);ymd=`${y}${m}${d}`;dmy=`${d}${m}${y}`;mdy=`${m}${d}${y}`;yymmdd=`${sy}${m}${d}`;mmdd=`${m}${d}`;ddmm=`${d}${m}`;md=`${Number(m)}${Number(d)}`;}
-const groups=[[()=>`${fn}${ln}${year}@${domain}`,()=>`${fn}.${ln}${year}@${domain}`,()=>`${fn}${year}@${domain}`,()=>`${fn}_${ln}_${year}@${domain}`,()=>`${fn}${year}${ln}@${domain}`,()=>`${ln}.${fn}${year}@${domain}`,()=>`${fn}${sy}@${domain}`],[()=>`${fn}${dmy}@${domain}`,()=>`${fn}${mdy}@${domain}`,()=>`${fn}${ymd}@${domain}`,()=>`${fn}${yymmdd}@${domain}`,()=>`${fn}.${ln}${dmy}@${domain}`,()=>`${fn}.${ln}${ymd}@${domain}`],[()=>`${fn}${ddmm}@${domain}`,()=>`${fn}${mmdd}@${domain}`,()=>`${fn}${md}@${domain}`,()=>`${fn}.${ln}${ddmm}@${domain}`,()=>`${fn}.${ln}${mmdd}@${domain}`,()=>`${fn}${ln}${md}@${domain}`]]
-const rnd=[[()=>`${fn}${Math.floor(Math.random()*9999)+1}@${domain}`,()=>`${fn}.${ln}${Math.floor(Math.random()*999)+1}@${domain}`,()=>`${fn}_${ln}${Math.floor(Math.random()*9999)+1}@${domain}`,()=>`${ln}${Math.floor(Math.random()*9999)+1}@${domain}`],[()=>`${fn}.${ln}@${domain}`,()=>`${fn}${ln}@${domain}`,()=>`${fn[0]}${ln}@${domain}`,()=>`${fn}@${domain}`,()=>`${ln}.${fn}@${domain}`]];
-const r=Math.random()*100;let s=r<35?groups[0]:r<65?groups[1]:r<85?groups[2]:r<95?rnd[0]:rnd[1];return pick(s)();
+function generateEmail(firstName: string, lastName: string, domain: string, dob?: string): string {
+  const fn = firstName.toLowerCase().replace(/[^a-z]/g, "");
+  const ln = lastName.toLowerCase().replace(/[^a-z]/g, "");
+  const fi = fn[0] || "j";
+  const li = ln[0] || "s";
+
+  let yf = "1998";
+  let ys = "98";
+  let month = "07";
+  let day = "14";
+
+  if (dob && /^\d{4}-\d{2}-\d{2}$/.test(dob)) {
+    const parts = dob.split("-");
+    yf = parts[0];
+    ys = yf.slice(-2);
+    month = parts[1];
+    day = parts[2];
+  } else {
+    const randomAge = Math.floor(Math.random() * (40 - 18 + 1)) + 18;
+    const birthYear = new Date().getFullYear() - randomAge;
+    yf = birthYear.toString();
+    ys = yf.slice(-2);
+    const m = Math.floor(Math.random() * 12) + 1;
+    month = String(m).padStart(2, "0");
+    const d = Math.floor(Math.random() * 28) + 1;
+    day = String(d).padStart(2, "0");
+  }
+
+  const dm = `${day}${month}`;
+  const md = `${month}${day}`;
+
+  const humanNumbers = [
+    "7", "10", "11", "12", "14", "16", "18", "21", "23", "27",
+    "69", "77", "99", "111", "123", "143", "420", "786"
+  ];
+
+  const getHumanNumber = () => {
+    if (Math.random() < 0.6) {
+      return pick(humanNumbers);
+    } else {
+      return Math.random() < 0.7
+        ? String(Math.floor(Math.random() * 900) + 100)
+        : String(Math.floor(Math.random() * 9000) + 1000);
+    }
+  };
+
+  const num = getHumanNumber();
+  const rand3 = String(Math.floor(Math.random() * 900) + 100);
+
+  // Group 1: 50% - Birth year based
+  const groupYear: (() => string)[] = [
+    () => `${fn}${ln}${ys}`,
+    () => `${fn}.${ln}${ys}`,
+    () => `${fn}${ln}${yf}`,
+    () => `${fn}.${ln}${yf}`,
+    () => `${fn}_${ln}${ys}`,
+    () => `${fn}_${ln}${yf}`,
+    () => `${fn}${ln}_${ys}`,
+    () => `${fn}${ln}_${yf}`,
+    () => `${fn}${ys}${ln}`,
+    () => `${fn}${yf}${ln}`,
+    () => `${ln}${fn}${ys}`,
+    () => `${ln}.${fn}${ys}`,
+    () => `${ln}${fn}${yf}`,
+    () => `${ln}.${fn}${yf}`,
+    () => `${ln}_${fn}${ys}`,
+    () => `${fn}-${ln}${ys}`,
+    () => `${fn}.${ln}_${ys}`,
+    () => `${fn}${ys}.${ln}`,
+    () => `${fn}${yf}.${ln}`,
+    () => `${fn}${ln}.${ys}`,
+    () => `${fn}${ln}.${yf}`,
+    () => `${ln}${ys}${fn}`,
+    () => `${fn}.${ln}-${ys}`,
+    () => `${fn}-${ln}${yf}`,
+  ];
+
+  // Group 2: 25% - Initial + year / Name + year
+  const groupInitialYear: (() => string)[] = [
+    () => `${fi}${ln}${ys}`,
+    () => `${fi}${ln}${yf}`,
+    () => `${fi}.${ln}${ys}`,
+    () => `${fi}.${ln}${yf}`,
+    () => `${fn}${ys}`,
+    () => `${fn}${yf}`,
+    () => `${fn}.${yf}`,
+    () => `${fn}.${ys}`,
+    () => `${fi}_${ln}${ys}`,
+    () => `${fi}_${ln}${yf}`,
+    () => `${ln}${fi}${ys}`,
+    () => `${ln}${fi}${yf}`,
+    () => `${ln}.${fi}${ys}`,
+    () => `${ln}.${fi}${yf}`,
+    () => `${fn}${li}${ys}`,
+    () => `${fn}${li}${yf}`,
+    () => `${fn}.${li}${ys}`,
+    () => `${fn}.${li}${yf}`,
+    () => `${fi}${ln}_${ys}`,
+    () => `${fi}${ln}_${yf}`,
+  ];
+
+  // Group 3: 15% - Month/day combinations
+  const groupMonthDay: (() => string)[] = [
+    () => `${fn}${ln}${dm}`,
+    () => `${fn}${ln}${md}`,
+    () => `${fn}.${ln}${dm}`,
+    () => `${fn}.${ln}${md}`,
+    () => `${fn}${dm}${ys}`,
+    () => `${fn}${md}${ys}`,
+    () => `${fn}${ln}${dm}${ys}`,
+    () => `${fn}.${ln}${dm}${ys}`,
+    () => `${fi}${ln}${dm}`,
+    () => `${fi}${ln}${md}`,
+    () => `${fn}_${dm}`,
+    () => `${fn}_${md}`,
+    () => `${ln}.${fn}${dm}`,
+    () => `${ln}.${fn}${md}`,
+    () => `${fn}_${ln}${dm}`,
+    () => `${fn}_${ln}${md}`,
+    () => `${fn}${dm}`,
+    () => `${fn}${md}`,
+  ];
+
+  // Group 4: 8% - Realistic random numbers
+  const groupRandomNumbers: (() => string)[] = [
+    () => `${fn}${ln}${num}`,
+    () => `${fn}.${ln}${num}`,
+    () => `${fn}${ln}${rand3}`,
+    () => `${fn}${rand3}`,
+    () => `${fn}_${ln}${rand3}`,
+    () => `${fi}${ln}${num}`,
+    () => `${fn}.${ln}${num}`,
+    () => `${fn}${ln}${num}`,
+    () => `${fi}${ln}${num}`,
+    () => `${fn}_${num}`,
+    () => `${ln}${fn}${num}`,
+    () => `${ln}.${fn}${num}`,
+    () => `${fn}.${num}`,
+  ];
+
+  // Group 5: 2% - Simple usernames
+  const groupSimple: (() => string)[] = [
+    () => `${fn}${ln}`,
+    () => `${fn}.${ln}`,
+    () => `${fi}${ln}`,
+    () => `${ln}${fn}`,
+    () => `${ln}.${fn}`,
+    () => `${fi}_${ln}`,
+    () => `${fn}_${ln}`,
+  ];
+
+  const rand = Math.random();
+  let local: string;
+
+  if (rand < 0.50) {
+    local = pick(groupYear)();
+  } else if (rand < 0.75) {
+    local = pick(groupInitialYear)();
+  } else if (rand < 0.90) {
+    local = pick(groupMonthDay)();
+  } else if (rand < 0.98) {
+    local = pick(groupRandomNumbers)();
+  } else {
+    local = pick(groupSimple)();
+  }
+
+  return `${local}@${domain}`;
 }
 
 function generatePassword(): string {
@@ -504,9 +663,9 @@ export function generateIdentity(
   const fullName  = `${firstName} ${lastName}`;
   const username  = generateUsername(firstName, lastName);
   const domain    = emailDomain || pick(country.emailDomains);
+  const password  = generatePassword();
   const { dob, age } = generateDateOfBirth();
   const email     = generateEmail(firstName, lastName, domain, dob);
-  const password  = generatePassword();
 
   return {
     country,
