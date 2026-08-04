@@ -55,132 +55,92 @@ function generateEmail(firstName: string, lastName: string, domain: string, dob?
 
   let yf = "1998";
   let ys = "98";
-  let month = "07";
-  let day = "14";
 
   if (dob && /^\d{4}-\d{2}-\d{2}$/.test(dob)) {
     const parts = dob.split("-");
     yf = parts[0];
     ys = yf.slice(-2);
-    month = parts[1];
-    day = parts[2];
   } else {
     const randomAge = Math.floor(Math.random() * (40 - 18 + 1)) + 18;
     const birthYear = new Date().getFullYear() - randomAge;
     yf = birthYear.toString();
     ys = yf.slice(-2);
-    const m = Math.floor(Math.random() * 12) + 1;
-    month = String(m).padStart(2, "0");
-    const d = Math.floor(Math.random() * 28) + 1;
-    day = String(d).padStart(2, "0");
   }
 
-  const dm = `${day}${month}`;
-  const md = `${month}${day}`;
-
-  const humanNumbers = [
-    "7", "10", "11", "12", "14", "16", "18", "21", "23", "27",
-    "69", "77", "99", "111", "123", "143", "420", "786"
-  ];
-
-  const getHumanNumber = () => {
-    if (Math.random() < 0.7) {
-      return pick(humanNumbers);
+  const getRandomNumber = (): string => {
+    const is2Digit = Math.random() < 0.5;
+    if (is2Digit) {
+      const common2 = ["12", "27", "45", "68", "91", "10", "11", "14", "16", "18", "21", "23", "77", "99"];
+      return Math.random() < 0.6 ? pick(common2) : String(Math.floor(Math.random() * 90) + 10);
     } else {
-      const realisticPool = ["248", "351", "482", "617", "731", "842", "915", "1034", "531"];
-      return Math.random() < 0.5
-        ? pick(realisticPool)
-        : String(Math.floor(Math.random() * 900) + 100);
+      const common3 = ["123", "248", "351", "482", "617", "731", "842", "915", "111", "143", "420", "786"];
+      return Math.random() < 0.6 ? pick(common3) : String(Math.floor(Math.random() * 900) + 100);
     }
   };
 
-  const num = getHumanNumber();
-
-  // Group 1: 55% - Birth Year Templates
+  // Group 1: 65% - Birth Year Templates
   const groupYear: (() => string)[] = [
     () => `${fn}${ln}${ys}`,
     () => `${fn}.${ln}${ys}`,
-    () => `${fn}_${ln}${ys}`,
-    () => `${fn}-${ln}${ys}`,
     () => `${fn}${ln}${yf}`,
     () => `${fn}.${ln}${yf}`,
-    () => `${fn}_${ln}${yf}`,
-    () => `${fn}-${ln}${yf}`,
     () => `${fi}${ln}${ys}`,
-    () => `${fi}.${ln}${ys}`,
-    () => `${fi}_${ln}${ys}`,
     () => `${fi}${ln}${yf}`,
+    () => `${fi}.${ln}${ys}`,
     () => `${fi}.${ln}${yf}`,
-    () => `${fn}${ys}`,
     () => `${fn}${yf}`,
-    () => `${fn}.${ys}`,
-    () => `${fn}_${ys}`,
+    () => `${fn}${ys}`,
+    () => `${fn}${ys}${ln}`,
+    () => `${fn}${yf}${ln}`,
+    () => `${fn}_${ln}${ys}`,
+    () => `${fn}_${ln}${yf}`,
     () => `${fn}${ln}_${ys}`,
     () => `${fn}${ln}_${yf}`,
+    () => `${fn}${ys}.${ln}`,
+    () => `${fn}${yf}.${ln}`,
     () => `${ln}${fn}${ys}`,
-    () => `${ln}.${fn}${ys}`,
-    () => `${ln}_${fn}${ys}`,
     () => `${ln}${fn}${yf}`,
+    () => `${ln}.${fn}${ys}`,
     () => `${ln}.${fn}${yf}`,
-    () => `${fn}${ys}${ln}`,
+    () => `${ln}_${fn}${ys}`,
+    () => `${ln}_${fn}${yf}`,
+    () => `${fn}.${ys}`,
+    () => `${fn}_${ys}`,
+    () => `${fi}_${ln}${ys}`,
+    () => `${fi}_${ln}${yf}`,
+    () => `${fn}-${ln}${ys}`,
+    () => `${fn}-${ln}${yf}`,
     () => `${fn}${li}${ys}`,
     () => `${fn}${li}${yf}`,
     () => `${fn}.${li}${ys}`,
     () => `${fn}_${li}${ys}`,
-    () => `${fi}${ln}_${ys}`,
   ];
 
-  // Group 2: 20% - Month + Day Templates
-  const groupMonthDay: (() => string)[] = [
-    () => `${fn}${ln}${dm}`,
-    () => `${fn}${ln}${md}`,
-    () => `${fn}.${ln}${dm}`,
-    () => `${fn}.${ln}${md}`,
-    () => `${fn}_${ln}${dm}`,
-    () => `${fn}_${ln}${md}`,
-    () => `${fn}${dm}`,
-    () => `${fn}${md}`,
-    () => `${fn}.${li}${dm}`,
-    () => `${fn}.${li}${md}`,
-    () => `${fn}_${li}${dm}`,
-    () => `${fn}_${li}${md}`,
-    () => `${fi}${ln}${dm}`,
-    () => `${fi}${ln}${md}`,
-    () => `${fi}.${ln}${dm}`,
-    () => `${fi}.${ln}${md}`,
-    () => `${ln}.${fn}${dm}`,
-    () => `${ln}.${fn}${md}`,
-    () => `${ln}${fn}${dm}`,
-    () => `${ln}${fn}${md}`,
-    () => `${fn}${dm}${ys}`,
-    () => `${fn}${md}${ys}`,
-  ];
-
-  // Group 3: 15% - Human-like Random Numbers Templates
+  // Group 2: 25% - Random Numbers Templates (2-digit & 3-digit)
   const groupRandomNumbers: (() => string)[] = [
-    () => `${fn}${ln}${num}`,
-    () => `${fn}.${ln}${num}`,
-    () => `${fn}_${ln}${num}`,
-    () => `${fn}-${ln}${num}`,
-    () => `${fi}${ln}${num}`,
-    () => `${fi}.${ln}${num}`,
-    () => `${fi}_${ln}${num}`,
-    () => `${fn}${num}`,
-    () => `${fn}_${num}`,
-    () => `${fn}.${num}`,
-    () => `${ln}${fn}${num}`,
-    () => `${ln}.${fn}${num}`,
-    () => `${ln}_${fn}${num}`,
-    () => `${fn}${li}${num}`,
-    () => `${fn}.${li}${num}`,
-    () => `${fn}_${li}${num}`,
-    () => `${fi}${li}${num}`,
-    () => `${ln}${num}`,
-    () => `${ln}_${num}`,
-    () => `${ln}.${num}`,
+    () => `${fn}${ln}${getRandomNumber()}`,
+    () => `${fn}.${ln}${getRandomNumber()}`,
+    () => `${fn}_${ln}${getRandomNumber()}`,
+    () => `${fn}-${ln}${getRandomNumber()}`,
+    () => `${fi}${ln}${getRandomNumber()}`,
+    () => `${fi}.${ln}${getRandomNumber()}`,
+    () => `${fi}_${ln}${getRandomNumber()}`,
+    () => `${fn}${getRandomNumber()}`,
+    () => `${fn}_${getRandomNumber()}`,
+    () => `${fn}.${getRandomNumber()}`,
+    () => `${ln}${fn}${getRandomNumber()}`,
+    () => `${ln}.${fn}${getRandomNumber()}`,
+    () => `${ln}_${fn}${getRandomNumber()}`,
+    () => `${fn}${li}${getRandomNumber()}`,
+    () => `${fn}.${li}${getRandomNumber()}`,
+    () => `${fn}_${li}${getRandomNumber()}`,
+    () => `${fi}${li}${getRandomNumber()}`,
+    () => `${ln}${getRandomNumber()}`,
+    () => `${ln}_${getRandomNumber()}`,
+    () => `${ln}.${getRandomNumber()}`,
   ];
 
-  // Group 4: 10% - Simple Usernames Templates
+  // Group 3: 10% - Simple Usernames Templates
   const groupSimple: (() => string)[] = [
     () => `${fn}${ln}`,
     () => `${fn}.${ln}`,
@@ -200,10 +160,8 @@ function generateEmail(firstName: string, lastName: string, domain: string, dob?
   const rand = Math.random();
   let local: string;
 
-  if (rand < 0.55) {
+  if (rand < 0.65) {
     local = pick(groupYear)();
-  } else if (rand < 0.75) {
-    local = pick(groupMonthDay)();
   } else if (rand < 0.90) {
     local = pick(groupRandomNumbers)();
   } else {
