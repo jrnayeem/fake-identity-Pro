@@ -47,25 +47,48 @@ function generateUsername(firstName: string, lastName: string): string {
   return result.length > 20 ? result.slice(0, 20) : result;
 }
 
-function generateEmail(firstName: string, lastName: string, domainChoice: string, _dob?: string): string {
-  const cleanF = firstName.toLowerCase().replace(/[^a-z]/g, "");
-  const cleanL = lastName.toLowerCase().replace(/[^a-z]/g, "");
-  const domain = domainChoice === "any"
-    ? "gmail.com"
-    : domainChoice.replace("@", "");
+function generateEmail(firstName: string, lastName: string, domain: string): string {
 
-  const randNum = Math.floor(100 + Math.random() * 899);
-  const randShort = Math.floor(10 + Math.random() * 89);
+  const fn = firstName.toLowerCase().replace(/[^a-z]/g, "");
+  const ln = lastName.toLowerCase().replace(/[^a-z]/g, "");
 
-  const emailFormats = [
-    `${cleanF}.${cleanL}${randNum}@${domain}`,
-    `${cleanF}${cleanL}${randShort}@${domain}`,
-    `${cleanF.charAt(0)}${cleanL}${randNum}@${domain}`,
-    `${cleanF}.${cleanL}.${randShort}@${domain}`,
-    `${cleanL}.${cleanF}${randNum}@${domain}`
+  const patterns = [
+
+    // Existing patterns
+    () => `${fn}.${ln}@${domain}`,
+    () => `${fn}${ln}@${domain}`,
+    () => `${fn[0]}${ln}@${domain}`,
+    () => `${fn}.${ln[0]}@${domain}`,
+    () => `${fn}@${domain}`,
+
+    // Existing 2-digit number pattern
+    () => `${fn}.${ln}${Math.floor(Math.random() * 99) + 1}@${domain}`,
+
+    () => `${fn[0]}.${ln}@${domain}`,
+    () => `${fn}_${ln}@${domain}`,
+
+    // Existing 3-digit number pattern
+    () => `${fn}${Math.floor(Math.random() * 999) + 1}@${domain}`,
+
+    () => `${ln}.${fn}@${domain}`,
+
+    // Additional 2-digit number patterns
+    () => `${fn}${ln}${Math.floor(Math.random() * 90) + 10}@${domain}`,
+    () => `${fn[0]}${ln}${Math.floor(Math.random() * 90) + 10}@${domain}`,
+    () => `${fn}${Math.floor(Math.random() * 90) + 10}@${domain}`,
+    () => `${ln}.${fn}${Math.floor(Math.random() * 90) + 10}@${domain}`,
+
+    // Additional 3-digit number patterns
+    () => `${fn}.${ln}${Math.floor(Math.random() * 900) + 100}@${domain}`,
+    () => `${fn}${ln}${Math.floor(Math.random() * 900) + 100}@${domain}`,
+    () => `${fn[0]}${ln}${Math.floor(Math.random() * 900) + 100}@${domain}`,
+    () => `${fn}${Math.floor(Math.random() * 900) + 100}@${domain}`,
+    () => `${ln}.${fn}${Math.floor(Math.random() * 900) + 100}@${domain}`,
+
   ];
 
-  return emailFormats[Math.floor(Math.random() * emailFormats.length)];
+  return pick(patterns)();
+
 }
 
 function generatePassword(): string {
@@ -515,9 +538,9 @@ export function generateIdentity(
   const fullName  = `${firstName} ${lastName}`;
   const username  = generateUsername(firstName, lastName);
   const domain    = emailDomain || pick(country.emailDomains);
+  const email     = generateEmail(firstName, lastName, domain);
   const password  = generatePassword();
   const { dob, age } = generateDateOfBirth();
-  const email     = generateEmail(firstName, lastName, domain, dob);
 
   return {
     country,
