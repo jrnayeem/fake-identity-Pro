@@ -47,128 +47,25 @@ function generateUsername(firstName: string, lastName: string): string {
   return result.length > 20 ? result.slice(0, 20) : result;
 }
 
-function generateEmail(firstName: string, lastName: string, domain: string, dob?: string): string {
-  const fn = firstName.toLowerCase().replace(/[^a-z]/g, "");
-  const ln = lastName.toLowerCase().replace(/[^a-z]/g, "");
-  const fi = fn[0] || "j";
-  const li = ln[0] || "s";
+function generateEmail(firstName: string, lastName: string, domainChoice: string, _dob?: string): string {
+  const cleanF = firstName.toLowerCase().replace(/[^a-z]/g, "");
+  const cleanL = lastName.toLowerCase().replace(/[^a-z]/g, "");
+  const domain = domainChoice === "any"
+    ? "gmail.com"
+    : domainChoice.replace("@", "");
 
-  let yf = "1998";
-  let ys = "98";
+  const randNum = Math.floor(100 + Math.random() * 899);
+  const randShort = Math.floor(10 + Math.random() * 89);
 
-  if (dob && /^\d{4}-\d{2}-\d{2}$/.test(dob)) {
-    const parts = dob.split("-");
-    yf = parts[0];
-    ys = yf.slice(-2);
-  } else {
-    const randomAge = Math.floor(Math.random() * (40 - 18 + 1)) + 18;
-    const birthYear = new Date().getFullYear() - randomAge;
-    yf = birthYear.toString();
-    ys = yf.slice(-2);
-  }
-
-  const getRandomNumber = (): string => {
-    const is2Digit = Math.random() < 0.5;
-    if (is2Digit) {
-      const common2 = ["12", "27", "45", "68", "91", "10", "11", "14", "16", "18", "21", "23", "77", "99"];
-      return Math.random() < 0.6 ? pick(common2) : String(Math.floor(Math.random() * 90) + 10);
-    } else {
-      const common3 = ["123", "248", "351", "482", "617", "731", "842", "915", "111", "143", "420", "786"];
-      return Math.random() < 0.6 ? pick(common3) : String(Math.floor(Math.random() * 900) + 100);
-    }
-  };
-
-  // Group 1: 65% - Birth Year Templates
-  const groupYear: (() => string)[] = [
-    () => `${fn}${ln}${ys}`,
-    () => `${fn}.${ln}${ys}`,
-    () => `${fn}${ln}${yf}`,
-    () => `${fn}.${ln}${yf}`,
-    () => `${fi}${ln}${ys}`,
-    () => `${fi}${ln}${yf}`,
-    () => `${fi}.${ln}${ys}`,
-    () => `${fi}.${ln}${yf}`,
-    () => `${fn}${yf}`,
-    () => `${fn}${ys}`,
-    () => `${fn}${ys}${ln}`,
-    () => `${fn}${yf}${ln}`,
-    () => `${fn}_${ln}${ys}`,
-    () => `${fn}_${ln}${yf}`,
-    () => `${fn}${ln}_${ys}`,
-    () => `${fn}${ln}_${yf}`,
-    () => `${fn}${ys}.${ln}`,
-    () => `${fn}${yf}.${ln}`,
-    () => `${ln}${fn}${ys}`,
-    () => `${ln}${fn}${yf}`,
-    () => `${ln}.${fn}${ys}`,
-    () => `${ln}.${fn}${yf}`,
-    () => `${ln}_${fn}${ys}`,
-    () => `${ln}_${fn}${yf}`,
-    () => `${fn}.${ys}`,
-    () => `${fn}_${ys}`,
-    () => `${fi}_${ln}${ys}`,
-    () => `${fi}_${ln}${yf}`,
-    () => `${fn}-${ln}${ys}`,
-    () => `${fn}-${ln}${yf}`,
-    () => `${fn}${li}${ys}`,
-    () => `${fn}${li}${yf}`,
-    () => `${fn}.${li}${ys}`,
-    () => `${fn}_${li}${ys}`,
+  const emailFormats = [
+    `${cleanF}.${cleanL}${randNum}@${domain}`,
+    `${cleanF}${cleanL}${randShort}@${domain}`,
+    `${cleanF.charAt(0)}${cleanL}${randNum}@${domain}`,
+    `${cleanF}.${cleanL}.${randShort}@${domain}`,
+    `${cleanL}.${cleanF}${randNum}@${domain}`
   ];
 
-  // Group 2: 25% - Random Numbers Templates (2-digit & 3-digit)
-  const groupRandomNumbers: (() => string)[] = [
-    () => `${fn}${ln}${getRandomNumber()}`,
-    () => `${fn}.${ln}${getRandomNumber()}`,
-    () => `${fn}_${ln}${getRandomNumber()}`,
-    () => `${fn}-${ln}${getRandomNumber()}`,
-    () => `${fi}${ln}${getRandomNumber()}`,
-    () => `${fi}.${ln}${getRandomNumber()}`,
-    () => `${fi}_${ln}${getRandomNumber()}`,
-    () => `${fn}${getRandomNumber()}`,
-    () => `${fn}_${getRandomNumber()}`,
-    () => `${fn}.${getRandomNumber()}`,
-    () => `${ln}${fn}${getRandomNumber()}`,
-    () => `${ln}.${fn}${getRandomNumber()}`,
-    () => `${ln}_${fn}${getRandomNumber()}`,
-    () => `${fn}${li}${getRandomNumber()}`,
-    () => `${fn}.${li}${getRandomNumber()}`,
-    () => `${fn}_${li}${getRandomNumber()}`,
-    () => `${fi}${li}${getRandomNumber()}`,
-    () => `${ln}${getRandomNumber()}`,
-    () => `${ln}_${getRandomNumber()}`,
-    () => `${ln}.${getRandomNumber()}`,
-  ];
-
-  // Group 3: 10% - Simple Usernames Templates
-  const groupSimple: (() => string)[] = [
-    () => `${fn}${ln}`,
-    () => `${fn}.${ln}`,
-    () => `${fn}_${ln}`,
-    () => `${fn}-${ln}`,
-    () => `${fi}${ln}`,
-    () => `${fi}.${ln}`,
-    () => `${fi}_${ln}`,
-    () => `${ln}${fn}`,
-    () => `${ln}.${fn}`,
-    () => `${ln}_${fn}`,
-    () => `${fn}${li}`,
-    () => `${fn}.${li}`,
-    () => `${fn}_${li}`,
-  ];
-
-  const rand = Math.random();
-  let local: string;
-
-  if (rand < 0.65) {
-    local = pick(groupYear)();
-  } else if (rand < 0.90) {
-    local = pick(groupRandomNumbers)();
-  } else {
-    local = pick(groupSimple)();
-  }
-
-  return `${local}@${domain}`;
+  return emailFormats[Math.floor(Math.random() * emailFormats.length)];
 }
 
 function generatePassword(): string {
